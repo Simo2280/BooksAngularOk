@@ -1,0 +1,144 @@
+<div class="container" style="padding-bottom: 30px;">
+
+  <div style="padding-top: 30px; text-align: center;">
+    <span style="color: white; font-size: 30px; font-weight: bold;" >Gestione libri</span>
+  </div>
+  <div style="padding: 20px; text-align: center;">
+    <button mat-raised-button color="primary" (click)="onFlagCreate()">Aggiungi Libro</button>
+  </div>
+
+  <table mat-table [dataSource]="books$" class="mat-elevation-z8">
+    <ng-container matColumnDef="isbn">
+      <th mat-header-cell *matHeaderCellDef>ISBN</th>
+      <td mat-cell *matCellDef="let book" (click)="onGetBook(book.ISBN)">{{ book.ISBN }}</td>
+    </ng-container>
+    <ng-container matColumnDef="title">
+      <th mat-header-cell *matHeaderCellDef>Titolo</th>
+      <td mat-cell *matCellDef="let book" (click)="onGetBook(book.ISBN)">{{ book.title }}</td>
+    </ng-container>
+    <ng-container matColumnDef="author">
+      <th mat-header-cell *matHeaderCellDef>Autore</th>
+      <td mat-cell *matCellDef="let book">{{ book.author }}</td>
+    </ng-container>
+    <ng-container matColumnDef="edit">
+      <th mat-header-cell *matHeaderCellDef></th>
+      <td mat-cell *matCellDef="let book">
+        <button mat-raised-button color="primary" (click)="onFlagUpdateTrue(book)">Modifica</button>
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="delete">
+      <th mat-header-cell *matHeaderCellDef></th>
+      <td mat-cell *matCellDef="let book">
+        <button mat-icon-button style="margin-left: auto;" (click)="onDeleteBook(book.ISBN)">
+          <mat-icon aria-label="Close" style="color: white;">close</mat-icon>
+        </button>
+      </td>
+    </ng-container>
+    <tr mat-header-row *matHeaderRowDef="columnTable"></tr>
+    <tr mat-row *matRowDef="let row; columns: columnTable;"></tr>
+  </table>
+
+
+  <br>
+
+  <div *ngIf="flagUpdate" class="container mt-3" style="padding-bottom: 30px;">
+    <mat-card>
+      <mat-card-header>
+        <h2 style="color: white;">Modifica libro: {{bookForm.value.ISBN}}</h2>
+        <button mat-icon-button style="margin-left: auto;" (click)="onFlagUpdateFalse()">
+          <mat-icon aria-label="Close" style="color: white;">close</mat-icon>
+        </button>
+      </mat-card-header>
+      <mat-card-content>
+        <form [formGroup]="bookForm" (ngSubmit)="onUpdateBook()">
+          <mat-form-field appearance="fill">
+            Titolo
+            <input matInput placeholder="Titolo" formControlName="title">
+          </mat-form-field>
+          <mat-form-field appearance="fill">
+            Autore
+            <input matInput placeholder="Autore" formControlName="author">
+          </mat-form-field>
+          <mat-form-field appearance="fill">
+            Genere
+            <input matInput placeholder="Genere" formControlName="genre">
+          </mat-form-field>
+          <mat-form-field appearance="fill">
+            Anno di pubblicazione
+            <input matInput type="number" placeholder="Anno di pubblicazione" formControlName="publishedYear">
+          </mat-form-field>
+          <br>
+          <button mat-raised-button color="primary" type="submit">Modifica</button>
+        </form>
+
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <div *ngIf="flagActiveBook && (activeBook$ | async) as activeBook" class="card">
+    <mat-card>
+
+      <mat-card-header>
+        <h2 style="color: white;">{{activeBook.title}}</h2>
+        <button mat-icon-button style="margin-left: auto;" (click)="onFlagActive()">
+          <mat-icon aria-label="Close" style="color: white;">close</mat-icon>
+        </button>
+      </mat-card-header>
+      <mat-card-content style="color: white; display: flex; align-items: center; font-size: 18px;">
+        <div style="flex: 0 0 auto; margin-right: 16px; width: 250px; height: 400px; background-color: #333; display: flex; justify-content: center; align-items: center;">
+
+          <img *ngIf="loadCover" ngSrc="assets/spinner.gif" alt="loading" width="75" height="75" />
+
+          <img ngSrc="https://covers.openlibrary.org/b/ISBN/{{activeBook.ISBN}}-M.jpg" width="250" height="400" priority alt="img" (load)="onImageLoad()" [hidden]="loadCover" />
+
+        </div>
+
+
+        <div style="flex: 1 1 auto;">
+          <p style="font-size: 18px;">ISBN: {{ activeBook?.ISBN }}</p>
+          <p style="font-size: 18px;">Autore: {{ activeBook?.author }}</p>
+          <p style="font-size: 18px;">Genere: {{ activeBook?.genre }}</p>
+          <p style="font-size: 18px;">Anno: {{ activeBook?.publishedYear }}</p>
+        </div>
+      </mat-card-content>
+
+    </mat-card>
+  </div>
+
+  <div *ngIf="flagCreate" class="container mt-3">
+    <mat-card>
+      <mat-card-header>
+        <h2 style="color: white;">Aggiungi libro:</h2>
+      </mat-card-header>
+      <mat-card-content>
+
+        <form [formGroup]="bookForm" (ngSubmit)="onCreateBook()">
+          <mat-form-field appearance="fill">
+            ISBN
+            <input matInput formControlName="ISBN" required>
+          </mat-form-field>
+          <mat-form-field appearance="fill">
+            Titolo
+            <input matInput formControlName="title" required>
+          </mat-form-field>
+          <mat-form-field appearance="fill">
+            Autore
+            <input matInput formControlName="author" required>
+          </mat-form-field>
+          <mat-form-field appearance="fill">
+            Genere
+            <input matInput formControlName="genre" required>
+          </mat-form-field>
+          <mat-form-field appearance="fill">
+            Anno di pubblicazione
+            <input matInput type="number" formControlName="publishedYear" required>
+          </mat-form-field>
+          <br>
+          <button mat-raised-button color="primary" type="submit">Aggiungi</button>
+        </form>
+
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+</div>
